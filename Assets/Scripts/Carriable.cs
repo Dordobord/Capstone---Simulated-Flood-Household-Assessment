@@ -5,7 +5,8 @@ public class Carriable : Interactable
     [Header("Inventory Settings")]
     public string inventoryName = "Item";
 
-    protected bool isCarried = false;
+    protected bool isCarried;
+    protected bool isEquipped;
 
     private void Awake()
     {
@@ -19,22 +20,32 @@ public class Carriable : Interactable
 
     public override void Interact(GameObject player)
     {
-        if (isCarried) return;
+        if (isCarried)
+            return;
 
-        PlayerController pc = player.GetComponent<PlayerController>();
-        if (pc != null)
+        PlayerController playerController =
+            player.GetComponent<PlayerController>();
+
+        if (playerController == null)
+            return;
+
+        // Only mark it as carried if the inventory accepted the item.
+        if (playerController.CarryItem(this))
         {
             isCarried = true;
-            pc.CarryItem(this);
         }
     }
 
     public override bool CanInteract(GameObject player)
     {
-        if (isCarried) return false;
-        
-        PlayerController pc = player.GetComponent<PlayerController>();
-        if (pc != null && pc.GetCarriedItem() != null)
+        if (isCarried)
+            return false;
+
+        PlayerController playerController =
+            player.GetComponent<PlayerController>();
+
+        if (playerController != null &&
+            playerController.IsHoldingItem)
         {
             return false;
         }
@@ -42,14 +53,27 @@ public class Carriable : Interactable
         return base.CanInteract(player);
     }
 
+    public virtual void OnEquipped()
+    {
+        isEquipped = true;
+    }
+
+    public virtual void OnHolstered()
+    {
+        isEquipped = false;
+    }
+
     public virtual void OnDropped()
     {
         isCarried = false;
+        isEquipped = false;
     }
 
     public virtual void OnPlaced()
     {
         isCarried = false;
-        Destroy(this); // Remove carriable behavior so it becomes a static placed object
+        isEquipped = false;
+
+        Destroy(this);
     }
 }

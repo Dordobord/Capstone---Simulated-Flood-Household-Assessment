@@ -156,13 +156,18 @@ public class GameManager : MonoBehaviour
 
     public void UpdateInventoryUI(Carriable[] inventory, int selectedSlotIndex)
     {
-        if (slotTexts == null || slotBackgrounds == null) return;
+        if (slotTexts == null || slotBackgrounds == null)
+            return;
 
-        for (int i = 0; i < 4; i++)
+        int slotCount = Mathf.Min(slotTexts.Length, slotBackgrounds.Length);
+
+        for (int i = 0; i < slotCount; i++)
         {
-            if (i < slotTexts.Length && slotTexts[i] != null)
+            if (slotTexts[i] != null)
             {
-                if (inventory != null && i < inventory.Length && inventory[i] != null)
+                if (inventory != null &&
+                    i < inventory.Length &&
+                    inventory[i] != null)
                 {
                     slotTexts[i].text = inventory[i].inventoryName;
                 }
@@ -172,9 +177,12 @@ public class GameManager : MonoBehaviour
                 }
             }
 
-            if (i < slotBackgrounds.Length && slotBackgrounds[i] != null)
+            if (slotBackgrounds[i] != null)
             {
-                slotBackgrounds[i].color = (i == selectedSlotIndex) ? selectedSlotColor : normalSlotColor;
+                slotBackgrounds[i].color =
+                    i == selectedSlotIndex
+                        ? selectedSlotColor
+                        : normalSlotColor;
             }
         }
     }
